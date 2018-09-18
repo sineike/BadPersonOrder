@@ -1,5 +1,5 @@
 {
-  "name": "badperson/order",
+  "name": "badperson/tp-order",
   "description": "基于tp5.1组件化开发的订单模块，目前正在调试，并不能应用于生产模式中。",
   "type": "library",
   "require": {
