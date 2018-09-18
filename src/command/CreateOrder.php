@@ -71,7 +71,7 @@ class CreateOrder extends Migrate
 
     protected function getTemplate()
     {
-        return __DIR__ . 'migrate.stub';
+        return __DIR__ . '/migrate.stub';
     }
 
 }
