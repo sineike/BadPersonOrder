@@ -1,0 +1,24 @@
+{
+  "name": "badperson/order",
+  "description": "基于tp5.1组件化开发的订单模块，目前正在调试，并不能应用于生产模式中。",
+  "type": "library",
+  "require": {
+    "php": ">=5.6"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "badPerson",
+      "email": "1249750733@qq.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+       "BadpersonOrder\\": "src"
+    },
+    "files": [
+      "src/command/config.php"
+    ]
+  }
+}
