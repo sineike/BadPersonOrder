@@ -9,28 +9,15 @@ use think\migration\command\Migrate;
 class CreateOrder extends Migrate
 {
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('CreateOrder')
              ->setDescription('Create a new order migration');
     }
 
-    /**
-     * Create the new migration.
-     *
-     * @param Input  $input
-     * @param Output $output
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @return void
-     */
     protected function execute(Input $input, Output $output)
     {
         $path = $this->getPath();
-
 
         if (!file_exists($path)) {
             if ($this->output->confirm($this->input, 'Create migrations directory? [y]/n')) {
@@ -42,29 +29,31 @@ class CreateOrder extends Migrate
 
         $path      = realpath($path);
 
-        // Compute the file path
-        $fileName = date('YmdHis').'_order.php';
-        $filePath = $path . DIRECTORY_SEPARATOR . $fileName;
+        $all_file = [
+            'order' => __DIR__ . '/order.stub',
+            'order_info' => __DIR__ . '/order_info.stub'
+        ];
 
-        if (is_file($filePath)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" already exists', $filePath));
+        foreach ($all_file as $k => $v) {
+
+            $fileName = date('YmdHis').rand(100,999).'_'.$k.'.php';
+            $filePath = $path . DIRECTORY_SEPARATOR . $fileName;
+
+            if (is_file($filePath)) {
+                throw new \InvalidArgumentException(sprintf('The file "%s" already exists', $filePath));
+            }
+
+            // Load the alternative template if it is defined.
+            $contents = file_get_contents($v);
+
+            // inject the class names appropriate to this migration
+
+            if (false === file_put_contents($filePath, $contents)) {
+                throw new \RuntimeException(sprintf('The file "%s" could not be written to', $path));
+            }
+
+            $output->writeln('<info>created</info> .' . str_replace(getcwd(), '', $filePath));
         }
-
-        // Load the alternative template if it is defined.
-        $contents = file_get_contents($this->getTemplate());
-
-        // inject the class names appropriate to this migration
-
-        if (false === file_put_contents($filePath, $contents)) {
-            throw new \RuntimeException(sprintf('The file "%s" could not be written to', $path));
-        }
-
-        $output->writeln('<info>created</info> .' . str_replace(getcwd(), '', $filePath));
     }
-
-    protected function getTemplate()
-    {
-        return __DIR__ . '/migrate.stub';
-    }
-
 }
+

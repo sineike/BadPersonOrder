@@ -1,0 +1,38 @@
+<?php
+
+use think\migration\Migrator;
+use think\migration\db\Column;
+
+class order extends Migrator
+{
+
+    /**
+     * Migrate Up.
+     */
+    public function up()
+    {
+        $table = $this->table('order',array('engine'=>'InnoDB'));
+        $table->addColumn('order_num', 'string',array('limit' => 30,'default'=>0,'comment'=>'订单号码'))
+            ->addColumn('user_id', 'integer',array('limit' => 11,'default'=>0,'comment'=>'用户id'))
+            ->addColumn('all_price', 'decimal',array('precision' =>10,'scale' => 2,'default'=>0,'comment'=>'总价'))
+            ->addColumn('price', 'decimal',array('precision' =>10,'scale' => 2,'default'=>0,'comment'=>'待支付价格'))
+            ->addColumn('coupon_price', 'decimal',array('precision' =>10,'scale' => 2,'default'=>0,'comment'=>'优惠价格'))
+            ->addColumn('consignee', 'string',array('limit' => 20,'default'=>'','comment'=>'收货人'))
+            ->addColumn('address', 'string',array('limit' => 100,'default'=>'','comment'=>'收货地址'))
+            ->addColumn('pay_status', 'boolean',array('limit' => 1,'default'=>1,'comment'=>'支付状态 1未支付 2已支付'))
+            ->addColumn('status', 'boolean',array('limit' => 2,'default'=>1,'comment'=>'订单状态 1待支付 2待发货 3待收货 4待评价 5完成'))
+            ->addColumn('add_time', 'string',array('limit' => 25,'default'=>'','comment'=>'添加时间'))
+             ->addColumn('is_delete', 'boolean',array('limit' => 1,'default'=>1,'comment'=>'软删除 1未删除 2已删除'))
+            ->addIndex(array('order_num'), array('unique' => true))
+            ->create();
+    }
+
+    /**
+     * Migrate Down.
+     */
+    public function down()
+    {
+
+    }
+}
+

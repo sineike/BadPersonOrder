@@ -1,0 +1,36 @@
+<?php
+
+use think\migration\Migrator;
+use think\migration\db\Column;
+
+class OrderInfo extends Migrator
+{
+
+    /**
+     * Migrate Up.
+     */
+    public function up()
+    {
+        $table = $this->table('order_info',array('engine'=>'InnoDB'));
+        $table->addColumn('order_id', 'integer',array('limit' => 11,'default'=>0,'comment'=>'订单id'))
+            ->addColumn('order_num', 'string',array('limit' => 30,'default'=>0,'comment'=>'订单号码'))
+            ->addColumn('goods_id', 'integer',array('limit' => 11,'default'=>0,'comment'=>'商品id'))
+            ->addColumn('all_price', 'decimal',array('precision' =>10,'scale' => 2,'default'=>0,'comment'=>'总价'))
+            ->addColumn('price', 'decimal',array('precision' =>10,'scale' => 2,'default'=>0,'comment'=>'待支付价格'))
+            ->addColumn('coupon_price', 'decimal',array('precision' =>10,'scale' => 2,'default'=>0,'comment'=>'优惠价格'))
+            ->addColumn('coupon_id', 'integer',array('limit' => 11,'default'=>0,'comment'=>'优惠券id'))
+            ->addColumn('num', 'integer',array('limit' => 11,'default'=>0,'comment'=>'购买数量'))
+            ->addColumn('spec', 'string',array('limit' => 30,'default'=>'','comment'=>'商品规格','null'=>true))
+            ->addIndex(array('order_num'), array('unique' => true))
+            ->addIndex(array('order_id'), array('unique' => true))
+            ->create();
+    }
+
+    /**
+     * Migrate Down.
+     */
+    public function down()
+    {
+
+    }
+}

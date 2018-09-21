@@ -2,73 +2,109 @@
 
 namespace BadpersonOrder;
 
-class Index
+use Exception;
+
+class Test
 {
-    public function add()
+    /**
+     * 获取订单列表
+     *
+     *  array $where 查询条件
+     *  int $type  1 获取带分页的object 2 查询多条数据 3查询一条数据 默认1)
+     *  int $page  页码   (默认0)
+     *  int $limit 每页条数 (默认10)
+     *  string $orderBy 排序规则 (默认id DESC)
+     * @return array|object
+     */
+    public function index()
     {
-        $result = [
-            'status' => false,
-            'msg' => '',
-            'info' => []
-        ];
-
+       //获取Order对象
         $orderObj =  OrderApi::getInstance();
-        $orderObj->setVal([
-            'goods_id' => 1,
-            'name' => '阿飞'
-        ]);
-        $orderObj->setRule([
-            'goods_id' => 'require',
-            'name'  => 'require|max:25',
-        ]);
-        $orderObj->setMsg([
-            'goods_id.require' => 'ID不能为空',
-            'name.require' => '名称不能为空',
-            'name.max'     => '名称最多不能超过25个字符',
-        ]);
+        $where = ['is_delete' => 1];
+        return $orderObj->orderList ($where, 2);
 
-        $validate = $orderObj->validate();
-        if (!$validate['status'] || !empty($validate['error'])) {
-            $result['msg'] = '数据格式有误';
-            $result['info'] = $validate['error'];
-            return json($result);
-        }
-
-        $orderObj->addOrder();
-        print_r($validate);die;
     }
 
-    public function update()
+    /**
+     * 添加订单
+     */
+    public function add()
     {
-        $result = [
-            'status' => false,
-            'msg' => '',
-            'info' => []
-        ];
-
+        //获取Order对象
         $orderObj =  OrderApi::getInstance();
+
+        //设置要添加的数据
         $orderObj->setVal([
             'goods_id' => 1,
-            'name' => '阿飞'
+            'user_id' => 1
         ]);
+
+        /*---------------验证数据开始--------------------*/
         $orderObj->setRule([
             'goods_id' => 'require',
-            'name'  => 'require|max:25',
+            'user_id'  => 'require',
         ]);
         $orderObj->setMsg([
-            'goods_id.require' => 'ID不能为空',
-            'name.require' => '名称不能为空',
-            'name.max'     => '名称最多不能超过25个字符',
+            'goods_id.require' => '商品ID不能为空',
+            'user_id.require' => '用户ID不能为空',
         ]);
-
         $validate = $orderObj->validate();
         if (!$validate['status'] || !empty($validate['error'])) {
-            $result['msg'] = '数据格式有误';
-            $result['info'] = $validate['error'];
-            return json($result);
+            throw new Exception("数据格式有误");
         }
+        /*---------------验证数据结束--------------------*/
 
-        $orderObj->updateOrder();
-        print_r($validate);die;
+        //添加数据
+        return  $orderObj->addOrder();
+    }
+
+    /**
+     * 修改订单
+     *
+     *  int $id 订单id
+     */
+    public function update()
+    {
+        //获取Order对象
+        $orderObj =  OrderApi::getInstance();
+
+        //设置要修改的数据
+        $orderObj->setVal([
+            'goods_id' => 1,
+            'user_id' => 1
+        ]);
+
+        /*---------------验证数据开始--------------------*/
+        $orderObj->setRule([
+            'goods_id' => 'require',
+            'user_id'  => 'require',
+        ]);
+        $orderObj->setMsg([
+            'goods_id.require' => '商品ID不能为空',
+            'user_id.require' => '用户ID不能为空',
+        ]);
+        $validate = $orderObj->validate();
+        if (!$validate['status'] || !empty($validate['error'])) {
+            throw new Exception("数据格式有误");
+        }
+        /*---------------验证数据结束--------------------*/
+
+        //修改数据
+        $id = '';
+        return  $orderObj->updateOrder($id);
+    }
+
+    /**
+     * 删除订单 (此删除为软删除 修改数据库 is_delete 字段)
+     *
+     *  int $id 订单id
+     */
+    public function delete()
+    {
+        //获取Order对象
+        $orderObj =  OrderApi::getInstance();
+        //删除数据
+        $id = '';
+        return  $orderObj->delOrder($id);
     }
 }
