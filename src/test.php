@@ -2,10 +2,17 @@
 
 namespace BadpersonOrder;
 
-use Exception;
+use BadpersonOrder\OrderApi;
 
 class Test
 {
+    private $orderObj;
+
+    public function __construct()
+    {
+        $this->orderObj =  OrderApi::getInstance();
+    }
+
     /**
      * 获取订单列表
      *
@@ -18,11 +25,9 @@ class Test
      */
     public function index()
     {
-       //获取Order对象
-        $orderObj =  OrderApi::getInstance();
         $where = ['is_delete' => 1];
-        return $orderObj->orderList ($where, 2);
-
+        $list = $this->orderObj->orderList ($where, 2);
+        print_r($list);die;
     }
 
     /**
@@ -30,32 +35,58 @@ class Test
      */
     public function add()
     {
-        //获取Order对象
-        $orderObj =  OrderApi::getInstance();
-
-        //设置要添加的数据
-        $orderObj->setVal([
-            'goods_id' => 1,
+        //设置（order表）订单数据
+        $orderList = [
+            'price' => 1,
             'user_id' => 1
-        ]);
+        ];
+        $this->orderObj->setVal($orderList);
 
-        /*---------------验证数据开始--------------------*/
-        $orderObj->setRule([
-            'goods_id' => 'require',
+        /*---------------验证（order表）数据开始--------------------*/
+        $this->orderObj->setRule([
+            'price' => 'require',
             'user_id'  => 'require',
         ]);
-        $orderObj->setMsg([
-            'goods_id.require' => '商品ID不能为空',
+        $this->orderObj->setMsg([
+            'price.require' => '价格不能为空',
             'user_id.require' => '用户ID不能为空',
         ]);
-        $validate = $orderObj->validate();
-        if (!$validate['status'] || !empty($validate['error'])) {
-            throw new Exception("数据格式有误");
+        $validate = $this->orderObj->validate();
+        if (!$validate['status'] || !empty($validate['data'])) {
+            print_r($validate['data']);die;
         }
         /*---------------验证数据结束--------------------*/
 
+
+        //设置（order_info表）订单数据
+        $orderInfo = [
+            'goods_id' => 1,
+            'price' => 1.2,
+        ];
+        $this->orderObj->setVal($orderInfo);
+
+        /*---------------验证（order_info表）数据开始--------------------*/
+        $this->orderObj->setRule([
+            'price' => 'require',
+            'goods_id'  => 'require',
+        ]);
+        $this->orderObj->setMsg([
+            'price.require' => '价格不能为空',
+            'user_id.require' => '商品ID不能为空',
+        ]);
+        $validate = $this->orderObj->validate();
+        if (!$validate['status'] || !empty($validate['data'])) {
+            print_r($validate['data']);die;
+        }
+        /*---------------验证数据结束--------------------*/
+
+        //重新设置订单添加的数据
+        $orderList['orderInfo'] = $orderInfo;
+        $this->orderObj->setVal($orderList);
+
         //添加数据
-        return  $orderObj->addOrder();
+        $result = $this->orderObj->addOrder();
+        print_r($result);die;
     }
 
     /**
@@ -65,33 +96,29 @@ class Test
      */
     public function update()
     {
-        //获取Order对象
-        $orderObj =  OrderApi::getInstance();
-
         //设置要修改的数据
-        $orderObj->setVal([
-            'goods_id' => 1,
-            'user_id' => 1
+        $this->orderObj->setVal([
+            'status' => 2,
         ]);
 
         /*---------------验证数据开始--------------------*/
-        $orderObj->setRule([
-            'goods_id' => 'require',
-            'user_id'  => 'require',
+        $this->orderObj->setRule([
+            'status' => 'require',
         ]);
-        $orderObj->setMsg([
-            'goods_id.require' => '商品ID不能为空',
-            'user_id.require' => '用户ID不能为空',
+        $this->orderObj->setMsg([
+            'status.require' => '不能为空',
         ]);
-        $validate = $orderObj->validate();
-        if (!$validate['status'] || !empty($validate['error'])) {
-            throw new Exception("数据格式有误");
+        $validate = $this->orderObj->validate();
+        if (!$validate['status'] || !empty($validate['data'])) {
+            //打印验证错误结果
+            print_r($validate['data']);die;
         }
         /*---------------验证数据结束--------------------*/
 
         //修改数据
-        $id = '';
-        return  $orderObj->updateOrder($id);
+        $id = 1;
+        $result = $this->orderObj->updateOrder($id);
+        print_r($result);die;
     }
 
     /**
@@ -101,10 +128,9 @@ class Test
      */
     public function delete()
     {
-        //获取Order对象
-        $orderObj =  OrderApi::getInstance();
         //删除数据
-        $id = '';
-        return  $orderObj->delOrder($id);
+        $id = 2;
+        $result = $this->orderObj->delOrder($id);
+        print_r($result);die;
     }
 }

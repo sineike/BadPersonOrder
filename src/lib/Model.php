@@ -39,7 +39,7 @@ class Model
      * @param int $limit 每页条数
      * @return object|array
      */
-    public function getList ($where = array(), $type = 1, $page = 0, $limit = 10, $orderBy = 'id DESC')
+    public function getList ($where, $type, $page, $limit, $orderBy)
     {
         $obj = Db::name($this->table);
         if (!empty($where)) {
@@ -49,7 +49,7 @@ class Model
             $result = $obj->order($orderBy)->paginate($limit);
         } elseif ($type == 2) {
             $newPage = $page * $limit;
-            $result = $obj->order($orderBy)->limit($newPage, $limit)->slect();
+            $result = $obj->order($orderBy)->limit($newPage, $limit)->select();
         } else {
             $result = $obj->find();
         }
@@ -60,11 +60,35 @@ class Model
      * 添加订单信息
      *
      * @param array $data 订单数据
-     * @return int
+     * @return bool
      */
     public function add ($data)
     {
-        return Db::name($this->table)->insertGetId($data);
+        $orderInfo = $data['orderInfo'];
+        unset($data['orderInfo']);
+
+        Db::startTrans();
+        try{
+            $orderId = Db::name($this->table)->insertGetId($data);
+            if (!$orderId) {
+                Db::rollback();
+                return false;
+            }
+
+            $orderInfo['order_id'] = $orderId;
+            $orderInfo['order_num'] = $data['order_num'];
+            $info_status = Db::name('order_info')->insert($orderInfo);
+            if ($info_status) {
+                Db::commit();
+                return true;
+            } else {
+                Db::rollback();
+                return false;
+            }
+        } catch (\Exception $e) {
+            Db::rollback();
+            return false;
+        }
     }
 
     /**
@@ -87,6 +111,6 @@ class Model
      */
     public function del ($id)
     {
-        return Db::name($this->table)->where('id', $id)->update(['is_delete' => 2]);
+        return Db::name($this->table)->where('id', $id)->update(['is_delete' => 2, 'update_time' => date('Y-m-d H:i:s')]);
     }
 }

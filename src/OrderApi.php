@@ -86,7 +86,7 @@ class OrderApi
      * @param int $limit 每页条数
      * @return array|object
      */
-    public function orderList ($where, $type, $page, $limit, $orderBy)
+    public function orderList ($where = array(), $type = 1, $page = 0, $limit = 10, $orderBy = 'id DESC')
     {
         $list = $this->model->getList ($where, $type, $page, $limit, $orderBy);
         return Common::msg('获取信息成功', true, $list);
@@ -99,7 +99,7 @@ class OrderApi
      */
     public function addOrder ()
     {
-        if (empty($this->values)) {
+        if (empty($this->values) || !isset($this->values['orderInfo']) || empty($this->values['orderInfo'])) {
             return Common::msg('订单数据不能为空');
         }
 
@@ -154,6 +154,11 @@ class OrderApi
             return Common::msg('订单信息不存在');
         }
 
-        return $this->model->del($id);
+        $result = $this->model->del($id);
+        if ($result) {
+            return Common::msg('删除订单成功', true);
+        } else {
+            return Common::msg('删除订单失败');
+        }
     }
 }
